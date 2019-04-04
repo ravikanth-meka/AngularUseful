@@ -1,0 +1,70 @@
+#src\app\shared\pr-data-table\pr-data-table.component.html
+
+<div class="card-header clearfix">
+  <h6 class="mx-sm-1 float-left"><i class="fa fa-list"></i>{{gridTitle}}</h6>
+  <a class="mx-sm-1 float-left" href="javascript:void();" (click)="refreshDataGrid($event)"><i class="fa fa-refresh" style="color:white" aria-hidden="true"></i></a>
+  <a class="mx-sm-1 float-left" href="javascript:void();" (click)="applyFilter($event, dt)" title="show/hide column filters"><i class="fa fa-filter"  style="color:white" aria-hidden="true"></i></a>
+  <div class="mx-sm-1 float-left" href="javascript:void();" (click)="clearFilters($event, dt)" title="clear all filters">
+    <i class="fa fa-filter" style="z-index: 1;  top:0px; position: relative; "></i>
+    <i class="fa fa-ban" style=" z-index: 1;  top:7px; left:-8px; position: relative; "></i>
+  </div>
+  <div class= "tabletxt" style="text-align: right;">
+        {{currPageText}}
+  </div>
+</div>
+<p-table #dt [columns]="columns" [value]="_rows" [virtualRowHeight]="15" selectionMode="single" scrollHeight="450px" [reorderableColumns]="true"
+  [responsive]="true" [paginator]="true" [rows]="rowLimitInp"  [dataKey]="uniq_col" [resizableColumns]="true" [(selection)]="selectedRow" selectionMode="single"
+   (onPage)="onPageLoad($event, dt)" 
+   (onFilter)="onFilter($event, dt)"
+    (onRowSelect)="onRowSelect.emit($event)"
+   >
+  <ng-template pTemplate="caption" style="height:0%">
+    <div class="search" style="text-align: right" >
+       <span class="add-on"><i class="fa fa-search "></i></span>
+      <input #filterInput type="text" pInputText style="width:100%"  placeholder="Global Filter" (input)="dt.filterGlobal($event.target.value, 'contains')">
+    </div>
+  </ng-template>
+  <ng-template pTemplate="header" let-columns>
+    <tr>
+      <th *ngFor="let col of columns" pResizableColumn [pSortableColumn]="col.field" [style.width]="col.width"> 
+        <div>
+        {{col.name}}
+        <p-sortIcon class="float-right" [field]="col.field"></p-sortIcon>
+        </div>
+      </th>
+    </tr>
+    <tr *ngIf="applyfilter" >
+      <td style="background-color: #D5D6D7 !important; border: 1px solid white;" *ngFor="let col of columns; let i=index" [ngSwitch]="col.field" pResizableColumn>
+        <input #filterInputNew[{{i}}] name="filterInputNew[{{i}}]" *ngIf="applyfilter" pInputText [id]="col.field" 
+        type="text" style="width:98%" (input)="dt.filter($event.target.value, col.field, 'contains')">
+      </td>
+    </tr>
+  <!--<input #filterInputNew[{{i}}] name="filterInputNew[{{i}}]" *ngIf="applyfilter" pInputText [id]="col.field" type="text" style="width:98%" (input)="dt.filter($event.target.value, col.field, 'contains')">-->
+  <!--<input #filterInput *ngIf="applyfilter" class="form-control searchcolInput" placeholder="" type="text" (input)="dt.filter($event.target.value, col.field, 'contains')">-->
+
+  </ng-template>
+  <ng-template pTemplate="body" let-rowData let-rowIndex="rowIndex" let-columns="columns" let-expanded="expanded">
+    <tr [pSelectableRow]="rowData">
+      <td *ngFor="let col of columns" class="ui-resizable-column" >
+
+        <div *ngIf="col.isLink==='true'">
+          <a style="color: #008ce6 !important;" *ngIf="!col.callbackFunc" target="_blank" href="{{rowData[col.field]}}">
+            {{rowData[col.field]}}
+          </a>
+          <a style="color: #008ce6 !important;" *ngIf="col.callbackFunc" target="_blank" href="javascript:void(0)" 
+           (click)="columnCallback(rowData, col.callbackFunc)">
+            {{rowData[col.field]}}
+          </a>
+        </div>
+        <div *ngIf="col.isLink!=='true'">
+          {{rowData[col.field]}}
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+  <!--<ng-template pTemplate="summary">
+        <div style="text-align: left ; background-color:black;">
+            {{selectedRow!=null?selectedRow.request_time:"---"}}
+        </div>
+    </ng-template>-->
+</p-table>
