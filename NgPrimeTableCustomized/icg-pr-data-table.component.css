@@ -1,0 +1,6 @@
+.add-on {
+ position: absolute;
+ top: 6px;
+ left: 8px;
+ z-index: 100;
+}
